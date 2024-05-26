@@ -16,7 +16,10 @@
 | Initialize.m |  程序初始化 |
 | InsMech.m |  捷联惯导机械编排算法 |
 | InsPropagate.m |  误差状态预测 |
-| GNSSUpdate.m |  GNSS位置观测更新 |
+| GNSSUpdate.m |  GNSS位置/速度观测更新 |
+| ODONHCUpdate.m |  ODO/NHC观测更新 |
+| ZUPTUpdate.m |  ZUPT/ZARU更新 |
+| detectZUPT.m |  ZUPT探测 |
 | ErrorFeedback.m |  误差反馈 |
 | plot-function/calc_error.m |  计算导航误差 |
 | plot-function/plot_result.m |  绘制导航结果 |
