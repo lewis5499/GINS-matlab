@@ -1,0 +1,168 @@
+# GNSS/INS组合导航后处理程序配置文件
+
+# 输入配置
+input:
+    # IMU数据文件, 增量IMU数据, weeksec, gyrx, gyry, gyrz, accx, accy, accz, odoleft, odoright
+    imufilepath: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/HL20210114085657_ICM_0_IMU_ODO.bin
+    # GNSS定位文件, weeksec(s), lat(deg), lon(deg), alt(m), latstd(m), lonstd(m), altstd(m)
+    gnssfilepath: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/20210114_6.txt
+    # 结果输出文件夹
+    outputpath: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/GINS
+
+    # IMU文件数据列数(7, 8 or 9 with odo)
+    imudatalen: 9
+    # IMU原始数据频率, Hz
+    imudatarate: 200
+
+# 输出配置
+output:
+    issmoothing: false      # RTS平滑处理, false - 正向处理, true - 反向平滑
+
+    navdatarate: 10         # 导航频率, Hz
+    navdataformat: 0        # 输出格式, 0-11列文本, 1-16列二进制
+    isouttarget: false      # 是否输出到目标
+    outlever: [0.0, 0.0, 0.0] # 输出杆臂, m
+    outangle: [0.0, 0.0, 0.0] # 输出角度, deg
+    isoutimuerr: true       # 是否输出IMU的误差文件
+    isoutnbwb: false        # 是否输出载体角速度
+    isoutstd: false         # 是否输出标准差文件
+
+    isoutcalibimu: false # 是否输出补偿后的IMU数据文件
+
+alignment:
+    # 初始对准方式, 0-动对准, 1-给定初始姿态, 2-给定所有条件, 3-GNSS位置,姿态辅助初始航向, 4-GNSS位置,静态粗对准
+    alignmode: 2
+    # 动对准速度, m/s
+    alignvel: 5.0
+    # 粗对准时长, s
+    aligntime: 200
+
+# 安装参数
+installation:
+    antlever: [0.045, 0.46, -0.238] # 天线杆臂, IMU前右下方向, m
+    odolever: [-0.522, -0.47, 1.797] # 里程计杆臂, IMU前右下方向, m
+    bodyangle: [0.0, -0.2, 1.2] # IMU到载体的旋转角, deg
+    istwoodo: false         # 双里程计, 速度平均使用
+
+# 初始状态
+initialization:
+    initsow: 378331 # GPS周秒, s
+    endsow: 0   # GPS周秒, s
+
+    # 位置, 纬经高, deg, m; 速度, 北东地, m/s; 姿态, 横滚俯仰航向, deg
+    initpva: [30.4317593979, 114.481069167, 13.183, 0.0, 0.0, 0.0, 0.714, -0.041,
+        152.851]
+    # 位置标准差, m; 速度标准差, m/s; 姿态标准差, deg
+    initpvastd: [0.05, 0.05, 0.1, 0.05, 0.05, 0.05, 0.1, 0.1, 0.5]
+
+    # IMU初始误差
+    gyrbias: [-3700.0, -3400.0, 1000.0] # 初始陀螺零偏, deg/hr
+    accbias: [-10000.0, 3500.0, -6700.0] # 初始加表零偏, mGal
+    gyrscale: [10000.0, 1700.0, -500.0] # 初始比例因子, PPM
+    accscale: [0.0, 2000.0, 0.0] # 初始比例因子, PPM
+
+    # IMU状态初始标准差
+    isimuerrorstd: false                # 是否设置自定义IMU初始状态标准差, true-使用如下设定; false-使用内定
+    imubiasstd: [0, 0, 0, 0, 0, 0]      # IMU初始零偏标准差, deg/hr, mGal
+    imuscalestd: [0, 0, 0, 0, 0, 0]     # IMU初始比例因子标准差, PPM
+
+# IMU误差参数
+imumodel:
+    imutype: ICM20602   # IMU型号, 设为空则使用配置的IMU误差参数, 否则使用内置IMU参数
+
+    arw: [0, 0, 0]      # deg/sqrt(hr)
+    vrw: [0, 0, 0]      # m/s/sqrt(hr)
+    gbstd: [0, 0, 0]    # deg/hr
+    abstd: [0, 0, 0]    # mGal
+    gbt: [0, 0, 0]      # hr
+    abt: [0, 0, 0]      # hr
+
+    gsstd: [0, 0, 0]    # ppm
+    asstd: [0, 0, 0]    # ppm
+    gst: [0, 0, 0]      # hr
+    ast: [0, 0, 0]      # hr
+
+# 车载约束使用
+odometer:
+    isuseodo: true              # 使用里程计
+    isusenhc: true              # 使用NHC约束
+
+    std: [0.1, 0.1, 0.1]        # 前右下, m/s
+
+    odoscalestd: [100.0, 1000.0] # 里程计比例因子系统标准差, 初始标准差, PPM
+
+zerovelocity:
+    isusezupt: false
+    zuptstd: [0.1, 0.1, 0.1]    # 零速修正标准差, m/s
+
+    isusezihr: false
+    zihrstd: 0.1                # 零速航向锁定标准差, deg/s
+
+    zuptthr: [5e-05, 0.0005]    # 零速修正阈值, 增量数据, 评估std, rad, m/s; 里程计零速阈值, m/s, 占用第一个数据
+
+    isuseodozupt: false         # 使用里程计判断零速
+
+# GNSS配置
+gnss:
+    isusegnss: true        # 使用GNSS
+    isusegnssvel: false    # 使用GNSS多普勒速度, 和GNSS定位一个文件
+    gnssdatarate: 1        # GNSS数据率, Hz
+
+    gnssstdthre: 1.0       # GNSS数据质量控制, m
+    gnssdelay: 0.0         # GNSS数据延时仿真, s, 确保小于0.3s
+    gnssweight: 1.0        # GNSS权重系数, 大于1为降权, 小于1升权
+    isusegnssrobust: false # 使用新息抗差
+
+    # GNSS仿真中断配置
+    isuseoutage: false
+    outagetime: 0
+    outagelen: 60
+    outageperiod: 180
+
+# 位置辅助配置
+# 位置辅助文件, weeksec(s), lat(deg), lon(deg), alt(m), latstd(m), lonstd(m), altstd(m)
+posaid:
+    posfilepath: ''
+    isuseposaid: 0              # 启用位置辅助, 3 bits(lat, lon, alt), 0-null, 7-all
+    posaidrate: 1               # 更新频率, Hz
+    posaiddelayup: false        # 更新策略, 0-即时更新反馈, 1-延时更新状态转移反馈
+    posaidlever: [0.0, 0.0, 0.0] # 位置辅助杆臂, IMU前右下方向, m
+    # 气压高程辅助
+    isusebaroheight: false # 气压高程增量模式
+
+# 速度辅助配置
+# 速度辅助文件, weeksec(s), velforce(m/s), velright(m/s), veldown(m/s), forcestd(m/s), rightstd(m/s), downstd(m/s)
+velaid:
+    velfilepath: ''
+    isusevelaid: 0              # 启用速度辅助, 3 bits(lat, lon, alt), 0-null, 7-all
+    velaidrate: 1               # 更新频率, Hz
+    velaiddelayup: false        # 更新策略, 0-即时更新反馈, 1-延时更新状态转移反馈
+    velaidlever: [0.0, 0.0, 0.0] # 速度辅助杆臂, IMU前右下方向, m
+    isusecanvel: false          # CAN总线速度, 通过速度辅助第一维, 前向
+
+# 姿态辅助配置
+# 姿态辅助文件, weeksec(s), roll(deg), pitch(deg), yaw(deg), rollstd(deg), pitchstd(deg), yawstd(deg)
+attaid:
+    attfilepath: ''
+    isuseattaid: 0              # 启用姿态辅助, 3 bits(roll, pitch, yaw), 0-null, 7-all
+    attaidrate: 1               # 更新频率, Hz
+    attaiddelayup: false        # 更新策略, 0-即时更新反馈, 1-延时更新状态转移反馈
+    attaidbias: [0.0, 0.0, 0.0] # 姿态辅助安装角, 姿态辅助到IMU的旋转角, deg
+    isusemagheading: false      # 磁航向, 通过姿态辅助第三维
+    isusegnssheading: false     # 双天线航向, 通过姿态辅助第三维
+
+# gui自动生成
+gui:
+    dimension: 22               # 系统状态维度
+
+    navfile: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/GINS/LC_TXT.nav       # 导航结果文件
+    reffile: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/LC_NHC_ODO_SM_TXT_PROJ.nav # 参考结果文件
+    naverrfile: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/GINS/LC_TXT.err       # 导航误差文件
+    imuerrfile: /media/liqiang/DOG/Files/2023组合导航助教/第三次作业准备/GINS/LC_IMU_ERR.bin # IMU误差文件
+    stdfile: ''                 # 标准差文件
+
+    comparetimebias: 0          # 导航误差比较时间偏移
+    compareposbias: [0.0, 0.0, 0.0] # 导航误差比较位置偏移
+    compareattbias: [0.0, 0.0, 0.0] # 导航误差比较姿态偏移
+    compareshowerrstat: true    # 显示误差统计表
+    compareshowotgstat: false   # GNSS仿真中断统计
